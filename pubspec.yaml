@@ -7,3 +7,4 @@ environment:
 
 workspace:
   - src/domain
+  - apps/mobile
