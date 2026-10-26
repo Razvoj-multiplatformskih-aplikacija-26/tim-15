@@ -14,3 +14,7 @@ class ScoreOverLimitException extends DomainException {
 
   final Score score;
 }
+
+class PermissionDeniedException extends DomainException {
+  PermissionDeniedException(super.message);
+}

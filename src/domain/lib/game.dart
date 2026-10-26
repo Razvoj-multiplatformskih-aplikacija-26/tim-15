@@ -12,5 +12,5 @@ class Game {
   final String name;
   final String genre;
   final DateTime releaseDate;
-  final List<Board> boards = List.empty();
+  final List<Board> boards = [];
 }
