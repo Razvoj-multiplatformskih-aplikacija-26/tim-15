@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../models/ranking_rules.dart';
+import 'package:go_router/go_router.dart';
+import 'package:domain/domain.dart';
 import '../data/fake_data.dart';
-import '../models/leaderboard_entry.dart';
 import '../widgets/leaderboard_entry_card.dart';
 
 class LeaderboardScreen extends StatelessWidget {
@@ -12,21 +12,15 @@ class LeaderboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final theme = Theme.of(context);
-    final game = fakeGames.firstWhere((g) => g.id == gameId);
+    final gameIdInt = int.parse(gameId);
+    final game = fakeGames.firstWhere((g) => g.id == gameIdInt);
+    final board = fakeBoards.firstWhere((b) => b.game.id == gameIdInt);
 
-    final entries = fakeEntries.where((e) => e.gameId == gameId && e.status is Approved).toList();
+    final entries = board.scores
+        .where((s) => s.state == ScoreState.approved)
+        .toList();
 
-    entries.sort((a, b)
-    {
-      if(game.rules.rankingOrder == RankingOrder.descending)
-        {
-          return b.score.compareTo(a.score);
-        }
-      else
-        {
-          return a.score.compareTo(b.score);
-        }
-    });
+    entries.sort((a, b) => b.score.compareTo(a.score));
 
     return Scaffold(
       appBar: AppBar(title: Text('Leaderboard - ${game.name}')),
@@ -49,7 +43,12 @@ class LeaderboardScreen extends StatelessWidget {
             },
           ),
         ),
-      )
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push('/games/$gameId/submit'),
+        icon: const Icon(Icons.add),
+        label: const Text('Add Submission'),
+      ),
     );
   }
 }

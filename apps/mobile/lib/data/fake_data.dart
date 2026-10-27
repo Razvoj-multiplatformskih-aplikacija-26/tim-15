@@ -1,228 +1,120 @@
-import '../models/game.dart';
-import '../models/leaderboard_entry.dart';
-import '../models/user.dart';
-import '../models/ranking_rules.dart';
+import 'package:domain/domain.dart';
+import 'package:flutter/foundation.dart';
 
-const currentUser = User(
-  id: 'u-1',
-  username: 'gost',
-  role: Role.guest,
-);
-
-final fakeGames = <Game>[
-  const Game(
-    id: 'g-1',
-    name: 'Tetris',
-    description: 'Get as much points as u can',
-    rules: LeaderboardRules(
-      metricName: 'Points',
-      rankingOrder: RankingOrder.descending,
-      minimumValue: 0,
-      maximumValue: 999999,
-      participantLimit: 10,
-    ),
-  ),
-  const Game(
-    id: 'g-2',
-    name: 'Minecraft Speedrun',
-    description: 'Defeat the Ender Dragon as soon as possible',
-    rules: LeaderboardRules(
-      metricName: 'Time (in seconds)',
-      rankingOrder: RankingOrder.ascending,
-      minimumValue: 100,
-      maximumValue: 7200,
-      participantLimit: null,
-    ),
-  ),
-  const Game(
-    id: 'g-3',
-    name: 'CS2 Aim Trainer',
-    description: 'Hit as many targets as possible in 60 seconds',
-    rules: LeaderboardRules(
-      metricName: 'Points',
-      rankingOrder: RankingOrder.descending,
-      minimumValue: 0,
-      maximumValue: 1000,
-      participantLimit: 5,
-    ),
-  ),
-];
-
-final DateTime _now = DateTime.now();
-
-DateTime _daysAgo(int days) => _now.subtract(Duration(days: days));
+final currentUser = User(id: 'u-1', username: 'gost', role: Role.guest);
 
 final fakeUsers = <User>[
   currentUser,
-  const User(id: 'u-1', username: 'Vera', role: Role.guest),
-  const User(id: 'u-2', username: 'Lena', role: Role.guest),
-  const User(id: 'u-3', username: 'Masa', role: Role.guest),
-  const User(id: 'u-4', username: 'Anja', role: Role.guest),
-  const User(id: 'u-5', username: 'Djordje', role: Role.guest),
-  const User(id: 'u-6', username: 'Ivana', role: Role.guest),
-  const User(id: 'u-7', username: 'Tara', role: Role.guest),
-  const User(id: 'u-8', username: 'Filip', role: Role.guest),
-  const User(id: 'u-9', username: 'Ognjen', role: Role.guest),
-  const User(id: 'u-10', username: 'Teodora', role: Role.guest),
+  User(id: 'u-2', username: 'Megi', role: Role.guest),
+  User(id: 'u-3', username: 'Lena', role: Role.guest),
+  User(id: 'u-4', username: 'Masa', role: Role.guest),
+  User(id: 'u-5', username: 'Anja', role: Role.guest),
+  User(id: 'u-6', username: 'Djordje', role: Role.guest),
+  User(id: 'u-7', username: 'Ivana', role: Role.guest),
+  User(id: 'u-8', username: 'Tara', role: Role.guest),
+  User(id: 'u-9', username: 'Filip', role: Role.guest),
 ];
 
-final fakeEntries = <LeaderboardEntry>[
- //tetris
-  LeaderboardEntry(
-    id: 'e-1',
-    gameId: 'g-1',
-    userId: 'u-2',
-    score: 15000,
-    status: Approved(_daysAgo(2)),
-    createdAt: _daysAgo(3),
-  ),
-  LeaderboardEntry(
-    id: 'e-2',
-    gameId: 'g-1',
-    userId: currentUser.id,
-    score: 12000,
-    status:Approved(_daysAgo(2)),
-    createdAt: _daysAgo(1),
-  ),
-  LeaderboardEntry(
-    id: 'e-3',
-    gameId: 'g-1',
-    userId: 'u-3',
-    score: 18000,
-    status: Approved(_daysAgo(2)),
-    createdAt: _daysAgo(5),
-  ),
-  LeaderboardEntry(
-    id: 'e-4',
-    gameId: 'g-1',
-    userId: 'u-4',
-    score: 9000,
-    status:Approved(_daysAgo(2)),
-    createdAt: _daysAgo(12),
-  ),
-  LeaderboardEntry(
-    id: 'e-5',
-    gameId: 'g-1',
-    userId: 'u-5',
-    score: 4000,
-    status:Approved(_daysAgo(2)),
-    createdAt: _daysAgo(12),
-  ),
-  LeaderboardEntry(
-    id: 'e-6',
-    gameId: 'g-1',
-    userId: 'u-6',
-    score: 2000,
-    status:Approved(_daysAgo(2)),
-    createdAt: _daysAgo(12),
-  ),
-  LeaderboardEntry(
-    id: 'e-7',
-    gameId: 'g-1',
-    userId: 'u-7',
-    score: 13000,
-    status:Approved(_daysAgo(2)),
-    createdAt: _daysAgo(12),
-  ),
-  LeaderboardEntry(
-    id: 'e-8',
-    gameId: 'g-1',
-    userId: 'u-8',
-    score: 900,
-    status:Approved(_daysAgo(2)),
-    createdAt: _daysAgo(12),
-  ),
-  LeaderboardEntry(
-    id: 'e-9',
-    gameId: 'g-1',
-    userId: 'u-9',
-    score: 4600,
-    status:Approved(_daysAgo(2)),
-    createdAt: _daysAgo(12),
-  ),
-  LeaderboardEntry(
-    id: 'e-10',
-    gameId: 'g-1',
-    userId: 'u-10',
-    score: 1000,
-    status:Approved(_daysAgo(2)),
-    createdAt: _daysAgo(12),
-  ),
-
-
-  // minecraft
-  LeaderboardEntry(
-    id: 'e-5',
-    gameId: 'g-2',
-    userId: 'u-2',
-    score: 300,
-    status: Approved(_daysAgo(1)),
-    createdAt: _daysAgo(2),
-  ),
-  LeaderboardEntry(
-    id: 'e-6',
-    gameId: 'g-2',
-    userId: 'u-3',
-    score: 250,
-    status: Approved(_daysAgo(3)),
-    createdAt: _daysAgo(4),
-  ),
-  LeaderboardEntry(
-    id: 'e-7',
-    gameId: 'g-2',
-    userId: currentUser.id,
-    score: 400,
-    status: Rejected('Too slow', _daysAgo(2)),
-    createdAt: _daysAgo(3),
-  ),
-  LeaderboardEntry(
-    id: 'e-8',
-    gameId: 'g-2',
-    userId: 'u-4',
-    score: 150,
-    status: const Pending(),
-    createdAt: _daysAgo(1),
-  ),
-
-  //cs2
-  LeaderboardEntry(
-    id: 'e-9',
-    gameId: 'g-3',
-    userId: currentUser.id,
-    score: 850,
-    status: Approved(_daysAgo(1)),
-    createdAt: _daysAgo(2),
-  ),
-  LeaderboardEntry(
-    id: 'e-10',
-    gameId: 'g-3',
-    userId: 'u-2',
-    score: 950,
-    status: Approved(_daysAgo(4)),
-    createdAt: _daysAgo(5),
-  ),
-  LeaderboardEntry(
-    id: 'e-11',
-    gameId: 'g-3',
-    userId: 'u-3',
-    score: 1100,
-    status: Rejected('Results are outside of the range', _daysAgo(2)),
-    createdAt: _daysAgo(2),
-  ),
-  LeaderboardEntry(
-    id: 'e-12',
-    gameId: 'g-3',
-    userId: 'u-5',
-    score: 700,
-    status: Archived('You archived this', _daysAgo(8)),
-    createdAt: _daysAgo(10),
-  ),
+final fakeGames = <Game>[
+  Game(id: 1, name: 'Tetris', genre: 'Puzzle', releaseDate: DateTime(1984)),
+  Game(id: 2, name: 'Minecraft Speedrun', genre: 'Sandbox', releaseDate: DateTime(2011)),
+  Game(id: 3, name: 'CS2 Aim Trainer', genre: 'Shooter', releaseDate: DateTime(2023)),
+  Game(id: 4, name: 'Chess', genre: 'Strategy', releaseDate: DateTime(1475)),
 ];
 
-String getUsername(String userId) {
-  final user = fakeUsers.firstWhere(
-        (u) => u.id == userId,
-    orElse: () => User(id: userId, username: 'Unknown player', role: Role.guest),
+final fakeBoards = <Board>[
+  Board(id: 1, limit: 10000, game: fakeGames[0]),
+  Board(id: 2, limit: 10000, game: fakeGames[1]),
+  Board(id: 3, limit: 5, game: fakeGames[2]),
+  Board(id: 4, limit: 100, game: fakeGames[3]),
+];
+
+Score _makeScore({
+  required int id,
+  required int scoreValue,
+  required Board board,
+  required User user,
+  required ScoreState state,
+  int daysAgo = 0,
+}) {
+  final now = DateTime.now().subtract(Duration(days: daysAgo));
+  final s = Score(
+    id: id,
+    name: 'Score $id',
+    createdAt: now,
+    lastModified: now,
+    score: scoreValue,
+    board: board,
+    user: user,
   );
-  return user.username;
+  s.state = state;
+  return s;
+}
+
+void _populateFakeData() {
+  // Tetris
+  fakeBoards[0].scores.addAll([
+    _makeScore(id: 1, scoreValue: 15000, board: fakeBoards[0], user: fakeUsers[1], state: ScoreState.approved),
+    _makeScore(id: 3, scoreValue: 18000, board: fakeBoards[0], user: fakeUsers[2], state: ScoreState.approved),
+    _makeScore(id: 4, scoreValue: 9000, board: fakeBoards[0], user: fakeUsers[3], state: ScoreState.approved),
+    _makeScore(id: 5, scoreValue: 4000, board: fakeBoards[0], user: fakeUsers[4], state: ScoreState.approved),
+    _makeScore(id: 6, scoreValue: 2000, board: fakeBoards[0], user: fakeUsers[5], state: ScoreState.approved),
+    _makeScore(id: 7, scoreValue: 13000, board: fakeBoards[0], user: fakeUsers[6], state: ScoreState.approved),
+    _makeScore(id: 8, scoreValue: 900, board: fakeBoards[0], user: fakeUsers[7], state: ScoreState.approved),
+    _makeScore(id: 9, scoreValue: 4600, board: fakeBoards[0], user: fakeUsers[0], state: ScoreState.pending),
+    _makeScore(id: 10, scoreValue: 1000, board: fakeBoards[0], user: fakeUsers[2], state: ScoreState.rejected),
+    _makeScore(id: 101, scoreValue: 12000, board: fakeBoards[0], user: currentUser, state: ScoreState.approved, daysAgo: 5),
+  ]);
+
+  // Minecraft
+  fakeBoards[1].scores.addAll([
+    _makeScore(id: 11, scoreValue: 300, board: fakeBoards[1], user: fakeUsers[1], state: ScoreState.approved),
+    _makeScore(id: 12, scoreValue: 250, board: fakeBoards[1], user: fakeUsers[2], state: ScoreState.approved),
+    _makeScore(id: 102, scoreValue: 400, board: fakeBoards[1], user: currentUser, state: ScoreState.rejected, daysAgo: 2),
+  ]);
+
+  // CS2
+  fakeBoards[2].scores.addAll([
+    _makeScore(id: 15, scoreValue: 950, board: fakeBoards[2], user: fakeUsers[1], state: ScoreState.approved),
+    _makeScore(id: 16, scoreValue: 700, board: fakeBoards[2], user: fakeUsers[4], state: ScoreState.archived),
+    _makeScore(id: 103, scoreValue: 800, board: fakeBoards[2], user: currentUser, state: ScoreState.pending, daysAgo: 1),
+  ]);
+}
+
+bool _initialized = false;
+void initializeFakeData() {
+  if (_initialized) return;
+  _populateFakeData();
+  _initialized = true;
+}
+
+List<Score> getMyScores() {
+  final List<Score> myScores = [];
+  for (final board in fakeBoards) {
+    myScores.addAll(board.scores.where((s) => s.user.id == currentUser.id));
+  }
+  return myScores..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+}
+
+class FakeDataNotifier extends ChangeNotifier {
+  void notify() {
+    notifyListeners();
+  }
+}
+
+final fakeDataNotifier = FakeDataNotifier();
+
+void approveScore(Score score) {
+  final userScores = score.board.scores
+      .where((s) => s.user.id == score.user.id)
+      .toList();
+
+  for (final s in userScores) {
+    if (s.id != score.id) {
+      score.board.scores.remove(s);
+    }
+  }
+  score.state = ScoreState.approved;
+
+  fakeDataNotifier.notify();
 }

@@ -12,6 +12,8 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
+  domain:
+    path: ../../src/domain
   flutter_localizations:
     sdk: flutter
   cupertino_icons: ^1.0.8

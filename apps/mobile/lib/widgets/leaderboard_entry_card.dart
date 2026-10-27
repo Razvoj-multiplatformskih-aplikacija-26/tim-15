@@ -1,8 +1,5 @@
+import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
-
-import '../models/game.dart';
-import '../models/leaderboard_entry.dart';
-import '../data/fake_data.dart';
 import '../text/serbian.dart';
 
 class LeaderboardEntryCard extends StatelessWidget {
@@ -13,7 +10,7 @@ required this.rank,
 required this.game,
 });
 
-final LeaderboardEntry entry;
+final Score entry;
 final int rank;
 final Game game;
 
@@ -50,7 +47,7 @@ Widget build(BuildContext context) {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  getUsername(entry.userId),
+                  entry.user.username,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),

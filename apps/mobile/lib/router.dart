@@ -1,13 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
-import 'models/game.dart';
-import 'models/leaderboard_entry.dart';
 import 'screens/home_shell.dart';
 import 'screens/game_screen.dart';
 import 'screens/leaderboard_screen.dart';
 import 'screens/entry_detail_screen.dart';
 import 'screens/my_entries_screen.dart';
+import 'screens/submit_score_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -38,6 +37,14 @@ final router = GoRouter(
                       builder: (context, state) {
                         final entryId = state.pathParameters['entryId']!;
                         return EntryDetailScreen(entryId: entryId);
+                      },
+                    ),
+                    GoRoute(
+                      path: 'submit',
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) {
+                        final gameId = int.parse(state.pathParameters['id']!);
+                        return SubmitScoreScreen(gameId: gameId);
                       },
                     ),
                   ],
