@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'data/fake_data.dart';
+
 import 'app.dart';
+import 'data/fake_repository.dart';
 
 void main() {
-  initializeFakeData();
-  runApp(const ScoreboardApp());
+  runApp(ScoreboardApp(repository: FakeRepository()));
 }
