@@ -22,6 +22,9 @@ class StubRepository implements Repository {
   Future<List<Score>> fetchMyScores() async => throw UnimplementedError();
 
   @override
+  Future<List<Score>> fetchAllScores() async => throw UnimplementedError();
+
+  @override
   Future<Score> submitScore(int gameId, int value) async =>
       throw UnimplementedError();
 
@@ -30,6 +33,9 @@ class StubRepository implements Repository {
 
   @override
   Future<void> approveScore(int id) async => throw UnimplementedError();
+
+  @override
+  Future<void> rejectScore(int id) async => throw UnimplementedError();
 
   @override
   User get currentUser => throw UnimplementedError();

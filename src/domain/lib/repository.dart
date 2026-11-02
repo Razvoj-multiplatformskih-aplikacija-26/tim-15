@@ -15,11 +15,15 @@ abstract class Repository {
 
   Future<List<Score>> fetchMyScores();
 
+  Future<List<Score>> fetchAllScores();
+
   Future<Score> submitScore(int gameId, int value);
 
   Future<void> withdrawScore(int id);
 
   Future<void> approveScore(int id);
+
+  Future<void> rejectScore(int id);
 
   User get currentUser;
 }

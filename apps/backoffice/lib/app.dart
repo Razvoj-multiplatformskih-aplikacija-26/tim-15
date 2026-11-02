@@ -21,7 +21,7 @@ class BackofficeApp extends StatelessWidget {
           create: (_) => GamesBloc(repository)..add(const GamesLoad()),
         ),
         BlocProvider(
-          create: (_) => MyEntriesBloc(repository)..add(const MyEntriesLoad()),
+          create: (_) => MyEntriesBloc(repository)..add(const MyEntriesLoadAll()),
         ),
       ],
       child: MaterialApp.router(

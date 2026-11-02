@@ -12,6 +12,10 @@ class MyEntriesLoad extends MyEntriesEvent {
   const MyEntriesLoad();
 }
 
+class MyEntriesLoadAll extends MyEntriesEvent {
+  const MyEntriesLoadAll();
+}
+
 class MyEntriesWithdraw extends MyEntriesEvent {
   const MyEntriesWithdraw(this.scoreId);
 
@@ -69,11 +73,19 @@ class MyEntriesError extends MyEntriesState {
   final String message;
 }
 
+class MyEntriesReject extends MyEntriesEvent {
+  const MyEntriesReject(this.scoreId);
+
+  final int scoreId;
+}
+
 class MyEntriesBloc extends Bloc<MyEntriesEvent, MyEntriesState> {
   MyEntriesBloc(this._repository) : super(const MyEntriesInitial()) {
     on<MyEntriesLoad>(_onLoad);
+    on<MyEntriesLoadAll>(_onLoadAll);
     on<MyEntriesWithdraw>(_onWithdraw);
     on<MyEntriesApprove>(_onApprove);
+    on<MyEntriesReject>(_onReject);
   }
 
   final Repository _repository;
@@ -82,6 +94,18 @@ class MyEntriesBloc extends Bloc<MyEntriesEvent, MyEntriesState> {
     emit(const MyEntriesLoading());
     try {
       final scores = await _repository.fetchMyScores();
+      emit(MyEntriesLoaded(scores));
+    } on DomainException catch (error) {
+      emit(MyEntriesError(error.message));
+    } catch (error) {
+      emit(MyEntriesError(error.toString()));
+    }
+  }
+
+  Future<void> _onLoadAll(MyEntriesLoadAll event, Emitter<MyEntriesState> emit) async {
+    emit(const MyEntriesLoading());
+    try {
+      final scores = await _repository.fetchAllScores();
       emit(MyEntriesLoaded(scores));
     } on DomainException catch (error) {
       emit(MyEntriesError(error.message));
@@ -109,6 +133,19 @@ class MyEntriesBloc extends Bloc<MyEntriesEvent, MyEntriesState> {
       await _repository.approveScore(event.scoreId);
       final withScores = state as MyEntriesWithScores;
       emit(MyEntriesApproved(List<Score>.from(withScores.scores)));
+    } on DomainException catch (error) {
+      emit(MyEntriesError(error.message));
+    } catch (error) {
+      emit(MyEntriesError(error.toString()));
+    }
+  }
+
+  Future<void> _onReject(MyEntriesReject event, Emitter<MyEntriesState> emit) async {
+    if (state is! MyEntriesWithScores) return;
+    try {
+      await _repository.rejectScore(event.scoreId);
+      final withScores = state as MyEntriesWithScores;
+      emit(MyEntriesLoaded(List<Score>.from(withScores.scores)));
     } on DomainException catch (error) {
       emit(MyEntriesError(error.message));
     } catch (error) {
