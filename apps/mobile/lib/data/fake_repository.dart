@@ -8,6 +8,33 @@ final class FakeRepository implements Repository {
       ..add(Board(id: 3, limit: 5, game: _games[2]))
       ..add(Board(id: 4, limit: 100, game: _games[3]));
     _populateFakeData();
+
+  }
+
+  @override
+  Future<List<Score>> fetchAllScores() async {
+    await _simulateLoad();
+    final allScores = <Score>[];
+    for (final board in _boards) {
+      allScores.addAll(board.scores);
+    }
+    allScores.sort((a, b) {
+      final gameCompare = a.board.game.name.compareTo(b.board.game.name);
+      if (gameCompare != 0) return gameCompare;
+
+      return b.score.compareTo(a.score);
+    });
+    return allScores;
+  }
+
+  @override
+  Future<void> rejectScore(int id) async {
+    await _simulateLoad();
+    final score = _findScore(id);
+    if (score == null) {
+      throw PermissionDeniedException('Score $id not found');
+    }
+    score.state = ScoreState.rejected;
   }
 
   static const _loadDelay = Duration(milliseconds: 800);

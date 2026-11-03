@@ -43,7 +43,7 @@ class LeaderboardScreen extends StatelessWidget {
         final entries = state.scores;
 
         return Scaffold(
-          appBar: AppBar(title: Text('Leaderboard - ${game.name}')),
+          appBar: AppBar(title: Text('${game.name}')),
           body: Center(
             child: entries.isEmpty
                 ? const Center(child: Text('No submissions yet'))

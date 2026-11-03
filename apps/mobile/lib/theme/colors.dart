@@ -41,7 +41,7 @@ abstract final class AppColorSchemes {
   static const dark = ColorScheme(
     brightness: Brightness.dark,
     primary: Color(0xFFCFBCFF),
-    onPrimary: Color(0xFF381E72),
+    onPrimary: Color(0xFF321179),
     primaryContainer: Color(0xFF4F378B),
     onPrimaryContainer: Color(0xFFE8DEFF),
     secondary: Color(0xFF7EE0D6),
