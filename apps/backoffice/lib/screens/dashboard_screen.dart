@@ -42,8 +42,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Score? _getSelectedScore(List<Score> scores) {
     if (scores.isEmpty) return null;
+    if (widget.selectedId == null) return null;
     final index = scores.indexWhere((s) => s.id == _selectedId);
-    if (index == -1) return scores.first;
+    if (index == -1) return null;
     return scores[index];
   }
 
