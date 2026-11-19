@@ -1,0 +1,22 @@
+name: server
+description: Scoreboard Management System server (Relic + PostgreSQL).
+publish_to: none
+
+environment:
+  sdk: ^3.13.5
+
+resolution: workspace
+
+dependencies:
+  bcrypt: ^1.2.0
+  domain:
+    path: ../../src/domain
+  postgres: ^3.6.0
+  relic: 1.2.0
+  scoreboard_api:
+    path: ../../src/api
+
+dev_dependencies:
+  lints: ^6.0.0
+  serverpod_embedded_postgres: ^4.1.2
+  test: ^1.26.0

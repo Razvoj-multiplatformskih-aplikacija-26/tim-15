@@ -7,5 +7,9 @@ environment:
 
 workspace:
   - src/domain
+  - src/api
+  - src/api_client
+  - src/platform
+  - apps/server
   - apps/mobile
   - apps/backoffice

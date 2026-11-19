@@ -1,15 +1,71 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:scoreboard_api_client/scoreboard_api_client.dart';
 import 'package:scoreboard_system/app.dart';
-import 'package:scoreboard_system/data/fake_repository.dart';
+
+import 'package:domain/domain.dart';
+
+http.Response jsonResponse(Object body, [int status = 200]) => http.Response(
+      jsonEncode(body),
+      status,
+      headers: {'content-type': 'application/json'},
+    );
+
+MockClient mockServer() {
+  return MockClient(
+      (http.Request request, [http.Client? client]) async {
+    if (request.method == 'GET' && request.url.path == '/api/auth/me') {
+      return jsonResponse(
+          {'id': '1', 'username': 'gost', 'role': 'guest', 'active': true});
+    }
+    if (request.method == 'GET' && request.url.path == '/api/games') {
+      return jsonResponse([
+        {'id': 1, 'name': 'Tetris', 'genre': 'Puzzle', 'date': '1984-01-01'},
+        {
+          'id': 2,
+          'name': 'Chess',
+          'genre': 'Strategy',
+          'date': '1475-01-01'
+        },
+      ]);
+    }
+    if (request.url.path == '/api/scores/me') {
+      return jsonResponse([]);
+    }
+    if (request.url.path == '/api/scores') {
+      return jsonResponse([]);
+    }
+    return jsonResponse(
+        {'code': 'not_found', 'message': 'Not found.'}, 404);
+  });
+}
 
 void main() {
   testWidgets('App renders games screen', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      ScoreboardApp(repository: FakeRepository()),
+    final store = InMemoryTokenStore();
+    await store.writeToken('test-token');
+    final server = mockServer();
+    final client = ScoreboardApiClient(
+      server,
+      baseUrl: Uri.parse('http://server.test'),
+      tokenStore: store,
     );
-    await tester.pump(const Duration(milliseconds: 1000));
+    final authRepository = ServerAuthRepository(client);
+    final auth = AuthBloc(authRepository)..add(const AuthRestore());
+
+    await tester.pumpWidget(
+      ScoreboardApp(
+        auth: auth,
+        repository: ServerRepository(client, authRepository),
+      ),
+    );
+    await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
 
-    expect(find.text('Scoreboard'), findsOneWidget);
+    expect(find.text('Scoreboard'), findsWidgets);
+    expect(find.text('Tetris'), findsWidgets);
   });
 }

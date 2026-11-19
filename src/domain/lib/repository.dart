@@ -27,3 +27,11 @@ abstract class Repository {
 
   User get currentUser;
 }
+
+abstract class AuthRepository {
+  Future<User> login(String username, String password);
+
+  Future<void> logout();
+
+  Future<User?> getSession();
+}

@@ -1,0 +1,24 @@
+name: scoreboard_platform
+description: Platform-specific secure credential storage for the Scoreboard Management System.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.13.5
+  flutter: ">=3.30.0"
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_secure_storage: ^10.0.0
+  scoreboard_api_client:
+    path: ../api_client
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:

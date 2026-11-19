@@ -7,23 +7,22 @@ import 'router.dart';
 import 'theme/theme.dart';
 
 class ScoreboardApp extends StatelessWidget {
-  const ScoreboardApp({super.key, required this.repository});
+  const ScoreboardApp({
+    super.key,
+    required this.auth,
+    required this.repository,
+  });
 
+  final AuthBloc auth;
   final Repository repository;
 
-  static const locale = Locale.fromSubtags(languageCode: 'sr', scriptCode: 'Latn');
+  static const locale =
+      Locale.fromSubtags(languageCode: 'sr', scriptCode: 'Latn');
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (_) => GamesBloc(repository)..add(const GamesLoad()),
-        ),
-        BlocProvider(
-          create: (_) => MyEntriesBloc(repository)..add(const MyEntriesLoad()),
-        ),
-      ],
+    return BlocProvider.value(
+      value: auth,
       child: MaterialApp.router(
         title: 'Scoreboard',
         theme: AppTheme.light(),
@@ -36,7 +35,7 @@ class ScoreboardApp extends StatelessWidget {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        routerConfig: createRouter(repository),
+        routerConfig: createRouter(repository, auth: auth),
       ),
     );
   }

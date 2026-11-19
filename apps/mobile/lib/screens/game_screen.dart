@@ -124,8 +124,12 @@ class _GamesScreenState extends State<GamesScreen> {
                         ? const Center(child: Text('No games found.'))
                         : ListView.separated(
                             padding: const EdgeInsets.all(16),
-                            itemCount:
-                                displayGames.length + (isSearching ? 0 : 1),
+                            itemCount: displayGames.length +
+                                (!isSearching &&
+                                        (games.length > _visibleCount ||
+                                            _visibleCount > 3)
+                                    ? 1
+                                    : 0),
                             separatorBuilder: (_, _) =>
                                 const SizedBox(height: 16),
                             itemBuilder: (context, index) {
@@ -142,16 +146,14 @@ class _GamesScreenState extends State<GamesScreen> {
                                   );
                                 }
 
-                                if (_visibleCount > 3) {
-                                  return Center(
-                                    child: OutlinedButton(
-                                      onPressed: () {
-                                        setState(() => _visibleCount = 3);
-                                      },
-                                      child: const Text('Show less'),
-                                    ),
-                                  );
-                                }
+                                return Center(
+                                  child: OutlinedButton(
+                                    onPressed: () {
+                                      setState(() => _visibleCount = 3);
+                                    },
+                                    child: const Text('Show less'),
+                                  ),
+                                );
                               }
 
                               final game = displayGames[index];

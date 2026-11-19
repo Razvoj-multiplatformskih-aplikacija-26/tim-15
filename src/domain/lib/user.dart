@@ -1,28 +1,25 @@
-import 'package:domain/board.dart';
-
 enum Role { guest, admin }
 
 class User {
-  final String id;
-  final String username;
-  final Role role;
-  final bool active = true;
-  final List<Score> scores = [];
-
-  User({
+  const User({
     required this.id,
     required this.username,
     required this.role,
+    this.active = true,
   });
 
-  void submitScore(Score score, Board board) {
-    if (!board.scores.contains(score)) {
-      board.addScore(score);
-    } else {
-      // For now since we're just mocking
-      Score here = board.scores.firstWhere((s) => s.user.id == id);
-      board.scores.remove(here);
-      board.addScore(score);
-    }
-  }
+  final String id;
+  final String username;
+  final Role role;
+  final bool active;
+
+  bool get isAdmin => role == Role.admin;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is User && other.id == id && other.username == username;
+
+  @override
+  int get hashCode => id.hashCode ^ username.hashCode;
 }

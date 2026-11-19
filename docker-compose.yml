@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-scoreboard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-scoreboard}
+      POSTGRES_DB: ${POSTGRES_DB:-scoreboard}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U ${POSTGRES_USER:-scoreboard} -d ${POSTGRES_DB:-scoreboard}
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  server:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-scoreboard}:${POSTGRES_PASSWORD:-scoreboard}@db:5432/${POSTGRES_DB:-scoreboard}?sslmode=disable
+      PORT: "8080"
+      SESSION_TTL_HOURS: ${SESSION_TTL_HOURS:-24}
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+
+volumes:
+  db_data:

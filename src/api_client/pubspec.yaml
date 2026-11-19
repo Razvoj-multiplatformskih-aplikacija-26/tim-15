@@ -1,0 +1,20 @@
+name: scoreboard_api_client
+description: Shared HTTP API client for the Scoreboard Management System, used by the mobile and backoffice apps.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.13.5
+
+resolution: workspace
+
+dependencies:
+  domain:
+    path: ../domain
+  scoreboard_api:
+    path: ../api
+  http: ^1.6.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.26.0

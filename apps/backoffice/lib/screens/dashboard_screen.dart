@@ -81,6 +81,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: const Text('Scoreboard Backoffice'),
         actions: [
+          Builder(
+            builder: (context) {
+              final state = context.watch<AuthBloc>().state;
+              if (state is! AuthLoggedIn) return const SizedBox.shrink();
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Row(
+                  children: [
+                    Text(
+                      state.user.username,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    IconButton(
+                      tooltip: 'Sign out',
+                      icon: const Icon(Icons.logout),
+                      onPressed: () => context
+                          .read<AuthBloc>()
+                          .add(const AuthLogout()),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Refresh (R)',
@@ -258,7 +282,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   Expanded(
                                     child: ListView.separated(
                                       itemCount: scores.length,
-                                      separatorBuilder: (_, __) => const Divider(height: 1),
+                                      separatorBuilder: (_, _) => const Divider(height: 1),
                                       itemBuilder: (context, index) {
                                         final score = scores[index];
                                         final isSelected = score.id == _selectedId;

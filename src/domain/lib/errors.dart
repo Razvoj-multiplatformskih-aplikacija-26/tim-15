@@ -18,3 +18,31 @@ class ScoreOverLimitException extends DomainException {
 class PermissionDeniedException extends DomainException {
   PermissionDeniedException(super.message);
 }
+
+class NotFoundException extends DomainException {
+  NotFoundException(super.message);
+}
+
+class ValidationException extends DomainException {
+  ValidationException(super.message);
+}
+
+class ConflictException extends DomainException {
+  ConflictException(super.message);
+}
+
+class AuthException extends DomainException {
+  AuthException(super.message);
+}
+
+class SessionExpiredException extends DomainException {
+  SessionExpiredException(super.message);
+}
+
+class NetworkException extends DomainException {
+  NetworkException(super.message);
+}
+
+class ServerErrorException extends DomainException {
+  ServerErrorException(super.message);
+}
