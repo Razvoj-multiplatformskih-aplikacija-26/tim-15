@@ -17,4 +17,22 @@ abstract final class RoutePatterns {
   static const withdraw = '/api/scores/:scoreId/withdraw';
   static const approve = '/api/scores/:scoreId/approve';
   static const reject = '/api/scores/:scoreId/reject';
+
+  static const List<String> all = [
+    health,
+    login,
+    logout,
+    me,
+    games,
+    game,
+    board,
+    leaderboard,
+    scores,
+    myScores,
+    score,
+    submit,
+    withdraw,
+    approve,
+    reject,
+  ];
 }

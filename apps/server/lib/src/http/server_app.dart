@@ -1,4 +1,5 @@
 import 'package:relic/relic.dart';
+import 'package:scoreboard_api/scoreboard_api.dart';
 
 import 'package:server/src/app_services.dart';
 import 'package:server/src/config.dart';
@@ -19,6 +20,10 @@ RelicApp createApp(Database database, Config config) {
   );
 
   final app = RelicApp()..use('/', corsAndErrors);
+
+  for (final pattern in RoutePatterns.all) {
+    app.options(pattern, (request) => Response.noContent());
+  }
 
   registerAuthRoutes(app, services,
       sessionTtlSeconds: config.sessionTtl.inSeconds);

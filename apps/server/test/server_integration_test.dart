@@ -38,6 +38,7 @@ void main() {
     final text = await response.transform(const Utf8Decoder()).join();
     return {
       'status': response.statusCode,
+      'headers': response.headers,
       'body': text.isEmpty ? null : jsonDecode(text),
     };
   }
@@ -152,6 +153,16 @@ void main() {
     final response = await request('GET', '/api/health');
     expect(response['status'], 200);
     expect(response['body'], {'status': 'ok'});
+  });
+
+  test('preflight requests are answered with CORS headers', () async {
+    final response = await request('OPTIONS', '/api/auth/login');
+    expect(response['status'], 204);
+    expect(response['headers']['access-control-allow-origin'], ['*']);
+    expect(response['headers']['access-control-allow-methods'],
+        ['GET, POST, OPTIONS']);
+    expect(response['headers']['access-control-allow-headers'],
+        ['authorization, content-type']);
   });
 
   test('requests without a session are rejected', () async {
