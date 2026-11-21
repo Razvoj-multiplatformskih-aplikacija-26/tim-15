@@ -7,9 +7,11 @@ final class AppServices {
     required this.scores,
     required this.users,
     required this.sessions,
+    required this.sessionTtlSeconds,
   });
 
   final ScoresRepository scores;
   final UsersRepository users;
   final SessionsRepository sessions;
+  final int sessionTtlSeconds;
 }

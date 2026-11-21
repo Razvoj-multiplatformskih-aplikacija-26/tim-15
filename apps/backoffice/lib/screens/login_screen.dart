@@ -79,13 +79,18 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         );
                       }
-                      if (state is! AuthLoginError) {
+                      final message = switch (state) {
+                        AuthLoginError(:final message) => message,
+                        AuthLoggedOut(:final message) => message,
+                        _ => null,
+                      };
+                      if (message == null) {
                         return const SizedBox.shrink();
                       }
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16),
                         child: Text(
-                          state.message,
+                          message,
                           textAlign: TextAlign.center,
                           style: TextStyle(color: colorScheme.error),
                         ),

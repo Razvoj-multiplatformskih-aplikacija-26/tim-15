@@ -40,7 +40,9 @@ class AuthRestoring extends AuthState {
 }
 
 class AuthLoggedOut extends AuthState {
-  const AuthLoggedOut();
+  const AuthLoggedOut({this.message});
+
+  final String? message;
 }
 
 class AuthLoggedIn extends AuthState {
@@ -77,9 +79,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = await _repository
           .getSession()
           .timeout(const Duration(seconds: 10));
-      emit(user == null ? const AuthLoggedOut() : AuthLoggedIn(user));
+      emit(user == null ? _loggedOutAfterRestore() : AuthLoggedIn(user));
     } on Object {
-      emit(const AuthLoggedOut());
+      emit(_loggedOutAfterRestore());
     }
   }
 
@@ -101,6 +103,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   void _onSessionExpired(AuthSessionExpired event, Emitter<AuthState> emit) {
-    emit(const AuthLoggedOut());
+    emit(const AuthLoggedOut(
+      message: 'Your session has expired. Please sign in again.',
+    ));
+  }
+
+  AuthLoggedOut _loggedOutAfterRestore() {
+    final current = state;
+    if (current is AuthLoggedOut && current.message != null) return current;
+    return const AuthLoggedOut();
   }
 }
