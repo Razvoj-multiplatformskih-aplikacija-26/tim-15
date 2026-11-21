@@ -40,7 +40,9 @@ class AuthRestoring extends AuthState {
 }
 
 class AuthLoggedOut extends AuthState {
-  const AuthLoggedOut();
+  const AuthLoggedOut({this.message});
+
+  final String? message;
 }
 
 class AuthLoggedIn extends AuthState {
@@ -71,8 +73,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onRestore(AuthRestore event, Emitter<AuthState> emit) async {
     emit(const AuthRestoring());
-    final user = await _repository.getSession();
-    emit(user == null ? const AuthLoggedOut() : AuthLoggedIn(user));
+    try {
+      // Secure storage or the server may fail to answer during startup. Do not
+      // leave the app on the splash screen indefinitely in that case.
+      final user = await _repository
+          .getSession()
+          .timeout(const Duration(seconds: 10));
+      emit(user == null ? _loggedOutAfterRestore() : AuthLoggedIn(user));
+    } on Object {
+      emit(_loggedOutAfterRestore());
+    }
   }
 
   Future<void> _onLogin(AuthLogin event, Emitter<AuthState> emit) async {
@@ -93,6 +103,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   void _onSessionExpired(AuthSessionExpired event, Emitter<AuthState> emit) {
-    emit(const AuthLoggedOut());
+    emit(const AuthLoggedOut(
+      message: 'Your session has expired. Please sign in again.',
+    ));
+  }
+
+  AuthLoggedOut _loggedOutAfterRestore() {
+    final current = state;
+    if (current is AuthLoggedOut && current.message != null) return current;
+    return const AuthLoggedOut();
   }
 }

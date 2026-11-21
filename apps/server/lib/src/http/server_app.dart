@@ -17,6 +17,7 @@ RelicApp createApp(Database database, Config config) {
     scores: ScoresRepository(database),
     users: UsersRepository(database),
     sessions: SessionsRepository(database),
+    sessionTtlSeconds: config.sessionTtl.inSeconds,
   );
 
   final app = RelicApp()..use('/', corsAndErrors);

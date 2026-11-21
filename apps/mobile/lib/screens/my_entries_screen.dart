@@ -41,7 +41,18 @@ class MyEntriesScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Entries')),
+      appBar: AppBar(
+        title: const Text('My Entries'),
+        actions: [
+          IconButton(
+            tooltip: 'Refresh submissions',
+            onPressed: () => context
+                .read<MyEntriesBloc>()
+                .add(const MyEntriesLoad()),
+            icon: const Icon(Icons.refresh),
+          ),
+        ],
+      ),
       body: BlocListener<MyEntriesBloc, MyEntriesState>(
         listener: (context, state) {
           if (state is MyEntriesWithdrawn) {
@@ -142,31 +153,6 @@ class MyEntriesScreen extends StatelessWidget {
                                         ),
                                       ],
 
-                                      if (score.state ==
-                                          ScoreState.pending) ...[
-                                        const SizedBox(height: 8),
-                                        Align(
-                                          alignment:
-                                              Alignment.centerRight,
-                                          child: TextButton.icon(
-                                            onPressed: () => context
-                                                .read<MyEntriesBloc>()
-                                                .add(
-                                                    MyEntriesApprove(
-                                                        score.id)),
-                                            icon: const Icon(
-                                                Icons
-                                                    .check_circle_outline,
-                                                size: 18),
-                                            label: const Text(
-                                                'Approve score (simulate)'),
-                                            style: TextButton.styleFrom(
-                                              foregroundColor:
-                                                  theme.colorScheme.primary,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
                                     ],
                                   ),
                                 ),

@@ -34,7 +34,7 @@ final class SessionsRepository {
     return record;
   }
 
-  Future<SessionRecord?> consume(String token) async {
+  Future<SessionRecord?> consume(String token, int ttlSeconds) async {
     final expiresAt = await _db.tx((session) async {
       final result = await session.execute(
         'SELECT s.token, s.user_id, s.expires_at '
@@ -49,7 +49,9 @@ final class SessionsRepository {
             .execute('DELETE FROM sessions WHERE token = \$1', parameters: [token]);
         return null;
       }
-      final next = current.add(const Duration(hours: 24));
+      final next = DateTime.now()
+          .toUtc()
+          .add(Duration(seconds: ttlSeconds));
       await session
           .execute('UPDATE sessions SET expires_at = \$1 WHERE token = \$2',
               parameters: [next, token]);

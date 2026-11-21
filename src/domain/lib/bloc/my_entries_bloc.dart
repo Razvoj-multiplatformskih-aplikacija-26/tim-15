@@ -131,8 +131,8 @@ class MyEntriesBloc extends Bloc<MyEntriesEvent, MyEntriesState> {
     if (state is! MyEntriesWithScores) return;
     try {
       await _repository.approveScore(event.scoreId);
-      final withScores = state as MyEntriesWithScores;
-      emit(MyEntriesApproved(List<Score>.from(withScores.scores)));
+      final scores = await _repository.fetchAllScores();
+      emit(MyEntriesApproved(scores));
     } on DomainException catch (error) {
       emit(MyEntriesError(error.message));
     } catch (error) {
@@ -144,8 +144,8 @@ class MyEntriesBloc extends Bloc<MyEntriesEvent, MyEntriesState> {
     if (state is! MyEntriesWithScores) return;
     try {
       await _repository.rejectScore(event.scoreId);
-      final withScores = state as MyEntriesWithScores;
-      emit(MyEntriesLoaded(List<Score>.from(withScores.scores)));
+      final scores = await _repository.fetchAllScores();
+      emit(MyEntriesLoaded(scores));
     } on DomainException catch (error) {
       emit(MyEntriesError(error.message));
     } catch (error) {

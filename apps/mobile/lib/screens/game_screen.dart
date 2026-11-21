@@ -27,7 +27,7 @@ class _GamesScreenState extends State<GamesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Scoreboard'),
+        title: const Text('Games'),
       ),
       body: BlocBuilder<GamesBloc, GamesState>(
         builder: (context, state) {

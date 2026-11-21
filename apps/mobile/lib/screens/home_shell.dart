@@ -43,10 +43,15 @@ class HomeShell extends StatelessWidget {
       body: shell,
       bottomNavigationBar: NavigationBar(
         selectedIndex: shell.currentIndex,
-        onDestinationSelected: (index) => shell.goBranch(
+        onDestinationSelected: (index) {
+          if (index == 1) {
+            context.read<MyEntriesBloc>().add(const MyEntriesLoad());
+          }
+          shell.goBranch(
             index,
-            initialLocation:
-                index == shell.currentIndex),
+            initialLocation: index == shell.currentIndex,
+          );
+        },
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.sports_esports_outlined),

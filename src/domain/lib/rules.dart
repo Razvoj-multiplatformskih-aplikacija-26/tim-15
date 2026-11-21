@@ -13,9 +13,17 @@ bool ranksInTopResults({
   required Iterable<int> rankedValues,
   required int capacity,
 }) {
-  final better = rankedValues.where((other) => other > value).length;
-  return better < capacity;
+  final rankedAhead = rankedValues.where((other) => other >= value).length;
+  return rankedAhead < capacity;
 }
+
+String leaderboardCapacityMessage({
+  required String gameName,
+  required int value,
+  required int capacity,
+}) =>
+    'The $gameName leaderboard is full - your result of $value '
+    'does not rank in the top $capacity.';
 
 bool canDecide(ScoreState state) => state == ScoreState.pending;
 

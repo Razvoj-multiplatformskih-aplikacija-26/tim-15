@@ -32,10 +32,10 @@ GoRouter createRouter(Repository repository, {required AuthBloc auth}) {
       if (authState is AuthRestoring || authState is AuthInitial) {
         return state.matchedLocation == '/splash' ? null : '/splash';
       }
-      if (loggingIn) return null;
       if (authState is AuthLoggedIn && authState.user.isAdmin) {
-        return null;
+        return loggingIn ? '/' : null;
       }
+      if (loggingIn) return null;
       return '/login';
     },
     routes: [

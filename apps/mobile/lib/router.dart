@@ -41,7 +41,7 @@ GoRouter createRouter(Repository repository, {required AuthBloc auth}) {
         return state.matchedLocation == '/splash' ? null : '/splash';
       }
       if (authState is AuthLoggedIn) {
-        return loggingIn ? '/' : null;
+        return loggingIn || state.matchedLocation == '/splash' ? '/' : null;
       }
       if (loggingIn) return null;
       return '/login';

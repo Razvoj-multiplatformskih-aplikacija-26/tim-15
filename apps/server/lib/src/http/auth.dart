@@ -15,7 +15,8 @@ Future<AuthenticatedUser> requireAuth(
   if (token == null || token.isEmpty) {
     throw const ServerApiException.unauthorized();
   }
-  final session = await services.sessions.consume(token);
+  final session = await services.sessions
+      .consume(token, services.sessionTtlSeconds);
   if (session == null) {
     throw const ServerApiException.unauthorized(
         'Your session has expired. Please sign in again.');

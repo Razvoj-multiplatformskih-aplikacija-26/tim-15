@@ -26,7 +26,8 @@ void main() {
       state: ScoreStateDto.approved,
       board: BoardDto(
         id: 3,
-        limit: 5,
+        maxScore: 5,
+        capacity: 5,
         game: GameDto(
           id: 3,
           name: 'CS2 Aim Trainer',
@@ -47,7 +48,8 @@ void main() {
     expect(decoded.value, 950);
     expect(decoded.state, ScoreStateDto.approved);
     expect(decoded.board.id, 3);
-    expect(decoded.board.limit, 5);
+    expect(decoded.board.maxScore, 5);
+    expect(decoded.board.capacity, 5);
     expect(decoded.board.game.name, 'CS2 Aim Trainer');
     expect(decoded.user.username, 'Megi');
   });

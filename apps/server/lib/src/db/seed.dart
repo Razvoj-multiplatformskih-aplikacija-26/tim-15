@@ -46,17 +46,17 @@ Future<void> seedIfEmpty(Database db) async {
       );
     }
 
-    const boards = <(String, int)>[
-      ('Tetris', 10000),
-      ('Minecraft Speedrun', 10000),
-      ('CS2 Aim Trainer', 5),
-      ('Chess', 100),
+    const boards = <(String, int, int)>[
+      ('Tetris', 20000, 10),
+      ('Minecraft Speedrun', 10000, 10),
+      ('CS2 Aim Trainer', 5, 5),
+      ('Chess', 100, 10),
     ];
-    for (final (gameName, limit) in boards) {
+    for (final (gameName, maxScore, capacity) in boards) {
       await session.execute(
-        'INSERT INTO boards (game_id, limit_value) '
-        'SELECT id, \$1 FROM games WHERE name = \$2',
-        parameters: [limit, gameName],
+        'INSERT INTO boards (game_id, max_score, capacity) '
+        'SELECT id, \$1, \$2 FROM games WHERE name = \$3',
+        parameters: [maxScore, capacity, gameName],
       );
     }
 

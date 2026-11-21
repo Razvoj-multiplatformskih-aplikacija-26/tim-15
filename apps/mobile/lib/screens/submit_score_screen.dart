@@ -119,11 +119,16 @@ class _SubmitScoreScreenState extends State<SubmitScoreScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Max result for this leaderboard is ${board.limit}.',
+                        'Max result for this game is ${board.maxScore}.',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.bold,
                         ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Only the top ${board.capacity} results are accepted.',
+                        style: theme.textTheme.bodyMedium,
                       ),
                       const SizedBox(height: 24),
                       TextFormField(
@@ -141,13 +146,10 @@ class _SubmitScoreScreenState extends State<SubmitScoreScreen> {
                           if (score == null) {
                             return 'Add a valid number.';
                           }
-                          if (score < 0) {
-                            return 'The result cannot be negative.';
-                          }
-                          if (score > board.limit) {
-                            return 'The result cant be bigger than ${board.limit}.';
-                          }
-                          return null;
+                          return validateScoreValue(
+                            value: score,
+                            maxScore: board.maxScore,
+                          );
                         },
                       ),
                     ],
