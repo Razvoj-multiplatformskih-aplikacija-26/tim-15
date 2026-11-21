@@ -156,19 +156,6 @@ final class ScoresRepository {
           );
         }
 
-        final previous = await session.execute(
-          'SELECT id FROM scores WHERE board_id = \$1 AND user_id = \$2 '
-          "AND state = 'approved'",
-          parameters: [boardId, userId],
-        );
-        for (final row in previous) {
-          await session.execute(
-            "UPDATE scores SET state = 'archived', last_modified = now() "
-            'WHERE id = \$1',
-            parameters: [row.toColumnMap()['id']],
-          );
-        }
-
         final inserted = await session.execute(
           'INSERT INTO scores (board_id, user_id, value, name, state) '
           "VALUES (\$1, \$2, \$3, 'Submission', 'pending') RETURNING id",
@@ -269,6 +256,21 @@ final class ScoresRepository {
               gameName: gameName,
               value: value,
               capacity: capacity,
+            );
+          }
+
+          // Keep the user's current approved score until this replacement
+          // has passed validation and is actually approved.
+          final previous = await session.execute(
+            'SELECT id FROM scores WHERE board_id = \$1 AND user_id = \$2 '
+            "AND state = 'approved'",
+            parameters: [boardId, userId],
+          );
+          for (final oldScore in previous) {
+            await session.execute(
+              "UPDATE scores SET state = 'archived', last_modified = now() "
+              'WHERE id = \$1',
+              parameters: [oldScore.toColumnMap()['id']],
             );
           }
 
