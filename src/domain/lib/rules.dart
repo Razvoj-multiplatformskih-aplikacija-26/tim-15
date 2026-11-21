@@ -13,8 +13,8 @@ bool ranksInTopResults({
   required Iterable<int> rankedValues,
   required int capacity,
 }) {
-  final better = rankedValues.where((other) => other > value).length;
-  return better < capacity;
+  final rankedAhead = rankedValues.where((other) => other >= value).length;
+  return rankedAhead < capacity;
 }
 
 bool canDecide(ScoreState state) => state == ScoreState.pending;

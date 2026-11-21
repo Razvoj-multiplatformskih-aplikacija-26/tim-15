@@ -5,6 +5,10 @@ final class SecureTokenStore implements TokenStore {
   SecureTokenStore({FlutterSecureStorage? storage})
       : _storage = storage ??
             const FlutterSecureStorage(
+              aOptions: AndroidOptions(
+                resetOnError: true,
+                migrateWithBackup: true,
+              ),
               webOptions: WebOptions(dbName: 'scoreboard_session'),
             );
 

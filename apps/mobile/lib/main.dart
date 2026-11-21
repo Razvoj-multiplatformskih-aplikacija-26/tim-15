@@ -12,6 +12,7 @@ const String serverUrl = String.fromEnvironment(
 );
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   late final AuthBloc auth;
   final client = ScoreboardApiClient(
     http.Client(),
@@ -20,11 +21,14 @@ void main() {
     onUnauthorized: () => auth.add(const AuthSessionExpired()),
   );
   final authRepository = ServerAuthRepository(client);
-  auth = AuthBloc(authRepository)..add(const AuthRestore());
+  auth = AuthBloc(authRepository);
   runApp(
     ScoreboardApp(
       auth: auth,
       repository: ServerRepository(client, authRepository),
     ),
   );
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    auth.add(const AuthRestore());
+  });
 }

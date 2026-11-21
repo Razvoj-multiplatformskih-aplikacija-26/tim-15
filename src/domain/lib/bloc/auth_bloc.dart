@@ -71,8 +71,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onRestore(AuthRestore event, Emitter<AuthState> emit) async {
     emit(const AuthRestoring());
-    final user = await _repository.getSession();
-    emit(user == null ? const AuthLoggedOut() : AuthLoggedIn(user));
+    try {
+      // Secure storage or the server may fail to answer during startup. Do not
+      // leave the app on the splash screen indefinitely in that case.
+      final user = await _repository
+          .getSession()
+          .timeout(const Duration(seconds: 10));
+      emit(user == null ? const AuthLoggedOut() : AuthLoggedIn(user));
+    } on Object {
+      emit(const AuthLoggedOut());
+    }
   }
 
   Future<void> _onLogin(AuthLogin event, Emitter<AuthState> emit) async {

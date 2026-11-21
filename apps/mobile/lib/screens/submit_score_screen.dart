@@ -141,13 +141,10 @@ class _SubmitScoreScreenState extends State<SubmitScoreScreen> {
                           if (score == null) {
                             return 'Add a valid number.';
                           }
-                          if (score < 0) {
-                            return 'The result cannot be negative.';
-                          }
-                          if (score > board.limit) {
-                            return 'The result cant be bigger than ${board.limit}.';
-                          }
-                          return null;
+                          return validateScoreValue(
+                            value: score,
+                            maxScore: board.limit,
+                          );
                         },
                       ),
                     ],

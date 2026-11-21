@@ -125,7 +125,7 @@ final class ScoresRepository {
 
         final competitors = await session.execute(
           'SELECT value FROM scores WHERE board_id = \$1 AND user_id <> \$2 '
-          "AND state = 'approved' ORDER BY value DESC",
+          "AND state IN ('approved', 'pending') ORDER BY value DESC",
           parameters: [boardId, userId],
         );
         if (!ranksInTopResults(
@@ -197,18 +197,61 @@ final class ScoresRepository {
       AuthenticatedUser actor, int scoreId, String newState) =>
       _db.tx((session) async {
         final rows = await session.execute(
-          'SELECT s.id, s.state FROM scores s '
-          'WHERE s.id = \$1 FOR UPDATE OF s',
+          'SELECT s.id, s.state, s.board_id, s.user_id, s.value, '
+          'b.limit_value FROM scores s '
+          'JOIN boards b ON b.id = s.board_id '
+          'WHERE s.id = \$1 FOR UPDATE OF b, s',
           parameters: [scoreId],
         );
         if (rows.isEmpty) {
           throw NotFoundException('The submission does not exist.');
         }
-        final state = _state(rows.first.toColumnMap()['state'] as String);
+        final row = rows.first.toColumnMap();
+        final state = _state(row['state'] as String);
         if (!canDecide(state)) {
           throw ConflictException(
             'Only pending submissions can be approved or rejected.',
           );
+        }
+        if (newState == 'approved') {
+          final boardId = row['board_id'] as int;
+          final userId = row['user_id'] as int;
+          final value = row['value'] as int;
+          final limit = row['limit_value'] as int;
+          final competitors = await session.execute(
+            'SELECT value FROM scores WHERE board_id = \$1 '
+            'AND user_id <> \$2 AND id <> \$3 '
+            "AND state IN ('approved', 'pending') ORDER BY value DESC",
+            parameters: [boardId, userId, scoreId],
+          );
+          final valueProblem = validateScoreValue(
+            value: value,
+            maxScore: limit,
+          );
+          if (valueProblem != null ||
+              !ranksInTopResults(
+                value: value,
+                rankedValues: competitors
+                    .map((row) => row.toColumnMap()['value'] as int),
+                capacity: limit,
+              )) {
+            throw ConflictException(
+              'This result no longer ranks in the top $limit and cannot be approved.',
+            );
+          }
+
+          final approved = await session.execute(
+            'SELECT id FROM scores WHERE board_id = \$1 AND user_id <> \$2 '
+            "AND state = 'approved' ORDER BY value DESC, id ASC",
+            parameters: [boardId, userId],
+          );
+          for (final displaced in approved.skip(limit - 1)) {
+            await session.execute(
+              "UPDATE scores SET state = 'archived', last_modified = now() "
+              'WHERE id = \$1',
+              parameters: [displaced.toColumnMap()['id']],
+            );
+          }
         }
         final affected = await session.execute(
           "UPDATE scores SET state = \$1, last_modified = now() "
