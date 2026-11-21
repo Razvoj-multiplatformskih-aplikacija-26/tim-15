@@ -57,6 +57,26 @@ const List<Migration> migrations = [
     CREATE INDEX idx_sessions_user ON sessions (user_id);
     ''',
   ),
+  Migration(
+    2,
+    'Separate board score maximum from ranking capacity',
+    '''
+    ALTER TABLE boards
+      ADD COLUMN max_score INTEGER NOT NULL DEFAULT 1 CHECK (max_score > 0);
+    ALTER TABLE boards
+      ADD COLUMN capacity INTEGER NOT NULL DEFAULT 10 CHECK (capacity > 0);
+    UPDATE boards b
+    SET max_score = GREATEST(
+          b.limit_value,
+          COALESCE((SELECT MAX(s.value) FROM scores s WHERE s.board_id = b.id), 0),
+          CASE WHEN g.name = 'Tetris' THEN 20000 ELSE 0 END
+        ),
+        capacity = CASE WHEN b.limit_value <= 10 THEN b.limit_value ELSE 10 END
+    FROM games g
+    WHERE g.id = b.game_id;
+    ALTER TABLE boards DROP COLUMN limit_value;
+    ''',
+  ),
 ];
 
 Future<void> runMigrations(Database db) async {

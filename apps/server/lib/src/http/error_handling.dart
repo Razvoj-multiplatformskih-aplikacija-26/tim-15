@@ -24,12 +24,18 @@ Response jsonResponse(Object? body, {int status = 200}) => Response(
       headers: withCors(Headers.empty()),
     );
 
-Response errorResponse(int status, String code, String message) => Response(
+Response errorResponse(
+  int status,
+  String code,
+  String message, {
+  Map<String, dynamic> details = const {},
+}) => Response(
       status,
-      body: Body.fromString(
-        jsonEncode(ApiError(code: code, message: message).toJson()),
-        mimeType: MimeType.json,
-      ),
+      body: Body.fromString(jsonEncode(ApiError(
+        code: code,
+        message: message,
+        details: details,
+      ).toJson()), mimeType: MimeType.json),
       headers: withCors(Headers.empty()),
     );
 
@@ -43,6 +49,24 @@ Handler corsAndErrors(Handler next) {
       result = await next(request);
     } on ServerApiException catch (error) {
       return errorResponse(error.status, error.code, error.message);
+    } on ScoreRangeViolation catch (error) {
+      final code = error.value < 0
+          ? ApiErrorCode.validation
+          : ApiErrorCode.overLimit;
+      return errorResponse(422, code, error.message,
+          details: {
+            'rule': ApiErrorRule.scoreRange,
+            'value': error.value,
+            'maxScore': error.maxScore,
+          });
+    } on LeaderboardCapacityViolation catch (error) {
+      return errorResponse(409, ApiErrorCode.conflict, error.message,
+          details: {
+            'rule': ApiErrorRule.leaderboardCapacity,
+            'gameName': error.gameName,
+            'value': error.value,
+            'capacity': error.capacity,
+          });
     } on ScoreOverLimitException catch (error) {
       return errorResponse(422, ApiErrorCode.overLimit, error.message);
     } on ValidationException catch (error) {

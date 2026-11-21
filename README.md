@@ -25,7 +25,7 @@ Glavni pojam sistema — prijava na liderboard — prolazi kroz najmanje četiri
 
 ### Pravila
 
-Korisnik može imati samo jedan upis na istom liderboardu, a svoj postojeći rezultat može ažurirati bez kreiranja duplog upisa. Svaki rezultat mora biti u dozvoljenom opsegu za datu igricu i validira se na serveru. Administrator može da deaktivira korisnika, pri čemu se njegovi prethodni rezultati i istorija prijava čuvaju. Administrator može da odobri ili odbije samo prijave koje su na čekanju. Ukoliko je liderboard ograničen na određeni broj učesnika, novi rezultat mora biti dovoljno dobar da se plasira među dozvoljeni broj najboljih rezultata, u suprotnom, upis se odbija.
+Korisnik može imati samo jedan upis na istom liderboardu, a svoj postojeći rezultat može ažurirati bez kreiranja duplog upisa. Svaki rezultat mora biti u dozvoljenom opsegu za datu igricu i validira se na serveru. Maksimalni rezultat i broj mesta u liderboardu predstavljaju odvojena podešavanja. Administrator može da deaktivira korisnika, pri čemu se njegovi prethodni rezultati i istorija prijava čuvaju. Administrator može da odobri ili odbije samo prijave koje su na čekanju. Ukoliko je liderboard ograničen na određeni broj učesnika, novi rezultat mora biti dovoljno dobar da se plasira među dozvoljeni broj najboljih rezultata, u suprotnom, upis se odbija.
 
 ### Rad bez mreže
 

@@ -7,7 +7,8 @@ import 'package:server/src/db/database.dart';
 
 const _scoreJoin = '''
   SELECT s.id, s.name, s.created_at, s.last_modified, s.value, s.state,
-         b.id AS board_id, b.limit_value AS board_limit,
+         b.id AS board_id, b.max_score AS board_max_score,
+         b.capacity AS board_capacity,
          g.id AS game_id, g.name AS game_name, g.genre, g.release_date,
          u.id AS user_id, u.username, u.role, u.active
   FROM scores s
@@ -39,7 +40,8 @@ final class ScoresRepository {
 
   Future<BoardDto?> boardForGame(int gameId) async {
     final result = await _db.pool.execute(
-      'SELECT b.id AS board_id, b.limit_value AS board_limit, '
+      'SELECT b.id AS board_id, b.max_score AS board_max_score, '
+      'b.capacity AS board_capacity, '
       'g.id AS game_id, g.name AS game_name, g.genre, g.release_date '
       'FROM boards b JOIN games g ON g.id = b.game_id WHERE g.id = \$1',
       parameters: [gameId],
@@ -48,7 +50,8 @@ final class ScoresRepository {
     final row = result.first.toColumnMap();
     return BoardDto(
       id: row['board_id'] as int,
-      limit: row['board_limit'] as int,
+      maxScore: row['board_max_score'] as int,
+      capacity: row['board_capacity'] as int,
       game: GameDto(
         id: row['game_id'] as int,
         name: row['game_name'] as String,
@@ -94,7 +97,7 @@ final class ScoresRepository {
   Future<ScoreDto> submit(AuthenticatedUser actor, int gameId, int value) =>
       _db.tx((session) async {
         final boardRows = await session.execute(
-          'SELECT b.id, b.limit_value, g.name FROM boards b '
+          'SELECT b.id, b.max_score, b.capacity, g.name FROM boards b '
           'JOIN games g ON g.id = b.game_id '
           'WHERE g.id = \$1 FOR UPDATE OF b',
           parameters: [gameId],
@@ -104,7 +107,8 @@ final class ScoresRepository {
         }
         final board = boardRows.first.toColumnMap();
         final boardId = board['id'] as int;
-        final limit = board['limit_value'] as int;
+        final maxScore = board['max_score'] as int;
+        final capacity = board['capacity'] as int;
         final gameName = board['name'] as String;
         final userId = actor.user.id;
 
@@ -120,8 +124,14 @@ final class ScoresRepository {
           );
         }
 
-        final problem = validateScoreValue(value: value, maxScore: limit);
-        if (problem != null) throw ValidationException(problem);
+        final problem = validateScoreValue(value: value, maxScore: maxScore);
+        if (problem != null) {
+          throw ScoreRangeViolation(
+            message: problem,
+            value: value,
+            maxScore: maxScore,
+          );
+        }
 
         final competitors = await session.execute(
           'SELECT value FROM scores WHERE board_id = \$1 AND user_id <> \$2 '
@@ -132,11 +142,17 @@ final class ScoresRepository {
           value: value,
           rankedValues:
               competitors.map((row) => row.toColumnMap()['value'] as int),
-          capacity: limit,
+          capacity: capacity,
         )) {
-          throw ConflictException(
-            'The $gameName leaderboard is full - your result of $value '
-            'does not rank in the top $limit.',
+          throw LeaderboardCapacityViolation(
+            message: leaderboardCapacityMessage(
+              gameName: gameName,
+              value: value,
+              capacity: capacity,
+            ),
+            gameName: gameName,
+            value: value,
+            capacity: capacity,
           );
         }
 
@@ -198,8 +214,9 @@ final class ScoresRepository {
       _db.tx((session) async {
         final rows = await session.execute(
           'SELECT s.id, s.state, s.board_id, s.user_id, s.value, '
-          'b.limit_value FROM scores s '
+          'b.max_score, b.capacity, g.name AS game_name FROM scores s '
           'JOIN boards b ON b.id = s.board_id '
+          'JOIN games g ON g.id = b.game_id '
           'WHERE s.id = \$1 FOR UPDATE OF b, s',
           parameters: [scoreId],
         );
@@ -217,7 +234,8 @@ final class ScoresRepository {
           final boardId = row['board_id'] as int;
           final userId = row['user_id'] as int;
           final value = row['value'] as int;
-          final limit = row['limit_value'] as int;
+          final maxScore = row['max_score'] as int;
+          final capacity = row['capacity'] as int;
           final competitors = await session.execute(
             'SELECT value FROM scores WHERE board_id = \$1 '
             'AND user_id <> \$2 AND id <> \$3 '
@@ -226,17 +244,31 @@ final class ScoresRepository {
           );
           final valueProblem = validateScoreValue(
             value: value,
-            maxScore: limit,
+            maxScore: maxScore,
           );
-          if (valueProblem != null ||
-              !ranksInTopResults(
+          if (valueProblem != null) {
+            throw ScoreRangeViolation(
+              message: valueProblem,
+              value: value,
+              maxScore: maxScore,
+            );
+          }
+          if (!ranksInTopResults(
+            value: value,
+            rankedValues: competitors
+                .map((row) => row.toColumnMap()['value'] as int),
+            capacity: capacity,
+          )) {
+            final gameName = row['game_name'] as String;
+            throw LeaderboardCapacityViolation(
+              message: leaderboardCapacityMessage(
+                gameName: gameName,
                 value: value,
-                rankedValues: competitors
-                    .map((row) => row.toColumnMap()['value'] as int),
-                capacity: limit,
-              )) {
-            throw ConflictException(
-              'This result no longer ranks in the top $limit and cannot be approved.',
+                capacity: capacity,
+              ),
+              gameName: gameName,
+              value: value,
+              capacity: capacity,
             );
           }
 
@@ -245,7 +277,7 @@ final class ScoresRepository {
             "AND state = 'approved' ORDER BY value DESC, id ASC",
             parameters: [boardId, userId],
           );
-          for (final displaced in approved.skip(limit - 1)) {
+          for (final displaced in approved.skip(capacity - 1)) {
             await session.execute(
               "UPDATE scores SET state = 'archived', last_modified = now() "
               'WHERE id = \$1',
@@ -302,7 +334,8 @@ final class ScoresRepository {
             },
         board: BoardDto(
           id: row['board_id'] as int,
-          limit: row['board_limit'] as int,
+          maxScore: row['board_max_score'] as int,
+          capacity: row['board_capacity'] as int,
           game: GameDto(
             id: row['game_id'] as int,
             name: row['game_name'] as String,

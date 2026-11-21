@@ -31,6 +31,30 @@ class ConflictException extends DomainException {
   ConflictException(super.message);
 }
 
+class ScoreRangeViolation extends ValidationException {
+  ScoreRangeViolation({
+    required String message,
+    required this.value,
+    required this.maxScore,
+  }) : super(message);
+
+  final int value;
+  final int maxScore;
+}
+
+class LeaderboardCapacityViolation extends ConflictException {
+  LeaderboardCapacityViolation({
+    required String message,
+    required this.gameName,
+    required this.value,
+    required this.capacity,
+  }) : super(message);
+
+  final String gameName;
+  final int value;
+  final int capacity;
+}
+
 class AuthException extends DomainException {
   AuthException(super.message);
 }

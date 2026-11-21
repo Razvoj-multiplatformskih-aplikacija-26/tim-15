@@ -185,7 +185,8 @@ void main() {
             return http.Response(
               jsonEncode(BoardDto(
                 id: 3,
-                limit: 5,
+                maxScore: 5,
+                capacity: 5,
                 game: GameDto(
                   id: 3,
                   name: 'CS2',
@@ -207,7 +208,8 @@ void main() {
     final board = await repository.fetchBoard(3);
 
     expect(board.id, 3);
-    expect(board.limit, 5);
+    expect(board.maxScore, 5);
+    expect(board.capacity, 5);
     expect(board.game.name, 'CS2');
   });
 

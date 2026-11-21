@@ -10,7 +10,8 @@ Game toDomainGame(GameDto dto) => Game(
 
 Board toDomainBoard(BoardDto dto) => Board(
       id: dto.id,
-      limit: dto.limit,
+      maxScore: dto.maxScore,
+      capacity: dto.capacity,
       game: toDomainGame(dto.game),
     );
 
@@ -38,4 +39,40 @@ Score toDomainScore(ScoreDto dto) {
     ScoreStateDto.archived => ScoreState.archived,
   };
   return score;
+}
+
+DomainException toDomainApiError(ApiError error) {
+  final details = error.details;
+  if (details['rule'] == ApiErrorRule.scoreRange) {
+    final value = details['value'];
+    final maxScore = details['maxScore'];
+    if (value is int && maxScore is int) {
+      final message = validateScoreValue(value: value, maxScore: maxScore);
+      if (message != null) return ValidationException(message);
+    }
+  }
+  if (details['rule'] == ApiErrorRule.leaderboardCapacity) {
+    final gameName = details['gameName'];
+    final value = details['value'];
+    final capacity = details['capacity'];
+    if (gameName is String && value is int && capacity is int) {
+      return ConflictException(leaderboardCapacityMessage(
+        gameName: gameName,
+        value: value,
+        capacity: capacity,
+      ));
+    }
+  }
+
+  return switch (error.code) {
+    ApiErrorCode.invalidCredentials => AuthException(error.message),
+    ApiErrorCode.userDisabled => AuthException(error.message),
+    ApiErrorCode.unauthenticated => SessionExpiredException(error.message),
+    ApiErrorCode.forbidden => PermissionDeniedException(error.message),
+    ApiErrorCode.notFound => NotFoundException(error.message),
+    ApiErrorCode.validation || ApiErrorCode.overLimit =>
+      ValidationException(error.message),
+    ApiErrorCode.conflict => ConflictException(error.message),
+    _ => ServerErrorException(error.message),
+  };
 }

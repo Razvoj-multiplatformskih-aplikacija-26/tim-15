@@ -17,6 +17,14 @@ bool ranksInTopResults({
   return rankedAhead < capacity;
 }
 
+String leaderboardCapacityMessage({
+  required String gameName,
+  required int value,
+  required int capacity,
+}) =>
+    'The $gameName leaderboard is full - your result of $value '
+    'does not rank in the top $capacity.';
+
 bool canDecide(ScoreState state) => state == ScoreState.pending;
 
 bool canWithdraw(ScoreState state) =>

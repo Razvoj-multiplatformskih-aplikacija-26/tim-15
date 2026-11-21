@@ -82,7 +82,7 @@ class SubmitScoreBloc extends Bloc<SubmitScoreEvent, SubmitScoreState> {
 
     final valueProblem = validateScoreValue(
       value: event.value,
-      maxScore: board.limit,
+      maxScore: board.maxScore,
     );
     if (valueProblem != null) {
       emit(SubmitScoreError(board, valueProblem));
@@ -91,12 +91,15 @@ class SubmitScoreBloc extends Bloc<SubmitScoreEvent, SubmitScoreState> {
     if (!ranksInTopResults(
       value: event.value,
       rankedValues: _rankedValues,
-      capacity: board.limit,
+      capacity: board.capacity,
     )) {
       emit(SubmitScoreError(
         board,
-        'The ${board.game.name} leaderboard is full - your result of ${event.value} '
-        'does not rank in the top ${board.limit}.',
+        leaderboardCapacityMessage(
+          gameName: board.game.name,
+          value: event.value,
+          capacity: board.capacity,
+        ),
       ));
       return;
     }

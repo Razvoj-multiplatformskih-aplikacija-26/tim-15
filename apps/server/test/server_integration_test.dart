@@ -210,7 +210,7 @@ void main() {
     expect(names, containsAll(['Tetris', 'Chess']));
   });
 
-  test('board returns the game limit', () async {
+  test('board returns maximum score and ranking capacity', () async {
     final response = await request(
       'GET',
       '/api/games/$tetrisId/board',
@@ -218,7 +218,8 @@ void main() {
     );
     expect(response['status'], 200);
     final board = response['body'] as Map<String, dynamic>;
-    expect(board['limit'], 10000);
+    expect(board['maxScore'], 20000);
+    expect(board['capacity'], 10);
     expect(board['game']['name'], 'Tetris');
   });
 

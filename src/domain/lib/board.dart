@@ -56,21 +56,26 @@ class Score {
 class Board {
   Board({
     required this.id,
-    required this.limit,
+    required this.maxScore,
+    required this.capacity,
     required this.game
   });
 
   final int id;
-  final int limit;
+  final int maxScore;
+  final int capacity;
   final Game game;
   final List<Score> scores = [];
 
   void addScore(Score score) {
-    if (score.score <= limit) {
+    if (score.score <= maxScore) {
       scores.add(score);
     } else {
       score.state = ScoreState.rejected;
-      throw ScoreOverLimitException('Score exceeds the limit of $limit', score);
+      throw ScoreOverLimitException(
+        'Score exceeds the maximum score of $maxScore',
+        score,
+      );
     }
   }
 

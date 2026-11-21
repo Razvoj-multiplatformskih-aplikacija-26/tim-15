@@ -5,6 +5,7 @@ import 'package:domain/domain.dart';
 import 'package:http/http.dart' as http;
 import 'package:scoreboard_api/scoreboard_api.dart';
 
+import 'mappers.dart';
 import 'token_store.dart';
 
 final class ScoreboardApiClient {
@@ -200,30 +201,13 @@ final class ScoreboardApiClient {
   }
 
   DomainException _mapError(int status, List<int> bytes) {
-    var code = ApiErrorCode.internal;
-    var message = 'Something went wrong. Please try again later.';
     final decoded = _decodeJson(bytes);
     if (decoded is Map<String, dynamic>) {
-      final decodedCode = decoded['code'];
-      final decodedMessage = decoded['message'];
-      if (decodedCode is String && decodedCode.isNotEmpty) {
-        code = decodedCode;
-      }
-      if (decodedMessage is String && decodedMessage.isNotEmpty) {
-        message = decodedMessage;
-      }
+      return toDomainApiError(ApiError.fromJson(decoded));
     }
-
-    return switch (code) {
-      ApiErrorCode.invalidCredentials => AuthException(message),
-      ApiErrorCode.userDisabled => AuthException(message),
-      ApiErrorCode.unauthenticated => SessionExpiredException(message),
-      ApiErrorCode.forbidden => PermissionDeniedException(message),
-      ApiErrorCode.notFound => NotFoundException(message),
-      ApiErrorCode.validation || ApiErrorCode.overLimit =>
-        ValidationException(message),
-      ApiErrorCode.conflict => ConflictException(message),
-      _ => ServerErrorException(message),
-    };
+    return toDomainApiError(const ApiError(
+      code: ApiErrorCode.internal,
+      message: 'Something went wrong. Please try again later.',
+    ));
   }
 }
